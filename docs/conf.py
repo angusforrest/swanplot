@@ -24,7 +24,7 @@ html_static_path = ["_static"]
 html_show_sourcelink = False
 html_theme_options = {
     "path_to_docs": "docs",
-    "repository_url": "https://github.com/lbparticles/lbparticles",
+    "repository_url": "https://github.com/angusforrest/swanplot",
     "repository_branch": "main",
     "launch_buttons": {
         "binderhub_url": "https://mybinder.org",
