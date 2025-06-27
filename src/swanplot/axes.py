@@ -69,14 +69,13 @@ ColorOptions = Union[ColorScheme, cname, pname]
 
 class axes(Model):
     """
-    :no-index:
     A class to represent axes for plotting data.
 
     Attributes:
-        color_scheme (ColorScheme | cname): The color scheme for the axes.
-        type (Literal["frame", "histogram"] | None): The type of data being plotted.
-        data (list[Frame] | list[Histogram] | str | None): The data to be plotted.
-        options (fig): Configuration options for the figure.
+        color_scheme (ColorScheme | cname): The color scheme for the axes. :noindex:
+        type (Literal["frame", "histogram"] | None): The type of data being plotted. :noindex:
+        data (list[Frame] | list[Histogram] | str | None): The data to be plotted. :noindex:
+        options (fig): Configuration options for the figure. :noindex:
     """
 
     color_scheme: ColorOptions = "steelblue"
@@ -93,10 +92,10 @@ class axes(Model):
         ],
     ):
         """
-        :no-index:
         Set the color map for the axes.
 
         :param colors: The colors to use in the color scheme.
+
         :param positions: The positions corresponding to the colors.
         """
         output = list()
