@@ -95,15 +95,21 @@ class axes(Model):
         self.type = "frame"
         return
 
-    def hist(self, a: np.ndarray, compact: bool = False):
+    def hist(
+        self,
+        a: np.ndarray,
+        compact: bool = True,
+        temp_tiff: bool = False,
+    ):
         if compact == True:
             ims = list()
             for t in range(a.shape[0]):
                 ims.append(Image.fromarray((a[t, ...]).astype(np.uint8), mode="L"))
             output = io.BytesIO()
             ims[0].save(output, "tiff", save_all=True, append_images=ims[1:])
-            with open("test.tiff", "wb") as file:
-                file.write(output.getvalue())
+            if temp_tiff:
+                with open("test.tiff", "wb") as file:
+                    file.write(output.getvalue())
             self.data = base64.b64encode(output.getvalue()).decode("utf-8")
             extremes = np.array([i.getextrema() for i in ims])
             self.options.max_intensity = int(extremes.max())
@@ -165,6 +171,7 @@ class axes(Model):
         fname: str,
         style: Literal["pretty", "compact"] = "pretty",
         format: Literal["json"] = "json",
+        print_website: bool = True,
     ):
         with open(fname, "w") as file:
             indentation: int
@@ -175,3 +182,5 @@ class axes(Model):
                     indentation = 0
             output = json.dumps(self.model_dump(), indent=indentation)
             file.write(output)
+            if print_website:
+                print(f"upload {fname} to https://animate.deno.dev")
