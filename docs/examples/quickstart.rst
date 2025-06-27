@@ -21,16 +21,16 @@ Example
 	def main():
 	    ax = plt.axes()
 	    ax.hist(example_histogram(), compact=True)
-	    ax.set_xlabel("x-axis")
-	    ax.set_ylabel("y-axis")
-	    ax.x_axis(start=-4, end=10)
-	    ax.y_axis(start=300, end=400)
+	    ax.set_label("x-axis","x")
+	    ax.set_label("y-axis","y")
+	    ax.uniform_axis(start=-4, end=10,"x")
+	    ax.uniform_axis(start=300, end=400,"x")
 	    ax.set_loop()
 	    ax.cmap(
 	        colors=["black", "pink", "steelblue", "green", "white"],
 	        positions=[0, 0.25, 0.5, 0.75, 1],
 	    )
-	    ax.x_unit(unit="pc")
-	    ax.y_unit(unit="pc")
-	    ax.t_unit(unit="Myr")
+	    ax.set_unit(unit="pc","x")
+	    ax.set_unit(unit="pc","y")
+	    ax.set_unit(unit="Myr","t")
 	    ax.savefig("test.json")

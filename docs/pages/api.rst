@@ -1,4 +1,3 @@
-.. module:: swanplot
 
 Detailed API documentation
 ==========================
@@ -6,4 +5,5 @@ Detailed API documentation
 .. automodule: swanplot.axes
     :autosummary:
 
-.. autoclass:: axes
+
+.. automodule:: swanplot
