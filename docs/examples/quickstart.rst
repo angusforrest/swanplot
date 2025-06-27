@@ -1,4 +1,4 @@
-.. _quickstart
+.. _quickstart:
 
 Example
 =======
@@ -16,12 +16,10 @@ Example
 	    a[0, 4] = 5
 	    b = [np.roll(a, shift=i, axis=1) for i in range(t)]
 	    return np.roll(np.array(b).reshape(t, c, c), shift=4, axis=0)
-
-
-
+		
 	def main():
 	    ax = plt.axes()
-	    ax.hist(np.random.rand(300, 160, 160), compact=True)
+	    ax.hist(example_histogram(), compact=True)
 	    ax.set_xlabel("x-axis")
 	    ax.set_ylabel("y-axis")
 	    ax.x_axis(start=-4, end=10)
