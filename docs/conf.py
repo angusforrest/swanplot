@@ -41,6 +41,7 @@ html_baseurl = "https://swanplot.readthedocs.io/en/latest/"
 nb_execution_mode = "force"
 html_sourcelink_suffix = ""
 autoclass_content = "both"
+napoleon_use_param = True
 autodoc_default_options = {
     "members": True,
     "member-order": "bysource",

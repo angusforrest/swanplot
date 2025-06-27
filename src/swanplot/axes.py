@@ -52,45 +52,21 @@ DataAxes = Union[Literal["x", "y", "t"], Literal[0, 1, 2]]
 
 
 class axes:
-    """
-    A class to represent axes for plotting data.
-
-    Attributes:
-        color_scheme (ColorScheme | cname): The color scheme for the axes.
-        type (Literal["frame", "histogram"] | None): The type of data being plotted.
-        data (list[Frame] | list[Histogram] | str | None): The data to be plotted.
-        options (fig): Configuration options for the figure.
-    """
-
     def __init__(self):
+        """
+        A class to represent axes for plotting data.
+
+        Attributes:
+            color_scheme (ColorScheme | cname): The color scheme for the axes.
+            type (Literal["frame", "histogram"] | None): The type of data being plotted.
+            data (list[Frame] | list[Histogram] | str | None): The data to be plotted.
+            options (fig): Configuration options for the figure.
+        """
+
         self.color_scheme: ColorScheme = ColorScheme()
         self.type: GraphTypes | None = None
         self.data: str | None = None
         self.options: Fig = Fig()
-
-    def cmap(
-        self,
-        colors: ColorStrings = ["black", "white"],
-        positions: IntensityValues = [
-            0,
-            1,
-        ],
-    ):
-        """
-        Set the color map for the axes.
-
-        :param colors: The colors to use in the color scheme.
-
-        :param positions: The positions corresponding to the colors.
-        """
-        output = list()
-        for color in colors:
-            if color in pname:
-                output.append(pythontocss[color])
-            else:
-                output.append(color)
-        self.color_scheme = ColorScheme(colors=colors, positions=positions)
-        return
 
     def _plot(
         self,
@@ -236,6 +212,30 @@ class axes:
         :param loop: If True, the plot will loop.
         """
         self.options.loop = loop
+
+    def cmap(
+        self,
+        colors: ColorStrings = ["black", "white"],
+        positions: IntensityValues = [
+            0,
+            1,
+        ],
+    ):
+        """
+        Set the color map for the axes.
+
+        :param colors: The colors to use in the color scheme.
+
+        :param positions: The positions corresponding to the colors.
+        """
+        output = list()
+        for color in colors:
+            if color in pname:
+                output.append(pythontocss[color])
+            else:
+                output.append(color)
+        self.color_scheme = ColorScheme(colors=colors, positions=positions)
+        return
 
     def savefig(
         self,
