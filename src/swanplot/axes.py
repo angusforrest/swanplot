@@ -4,7 +4,7 @@ from typing import Annotated, Sequence, Literal
 import json
 import numpy as np
 import base64
-from swanplot.cname import cname
+from swanplot.cname import cname, pname, pythontocss
 from PIL import Image
 import io
 
@@ -19,7 +19,7 @@ class Histogram(Model):
 
 
 class ColorScheme(Model):
-    colors: Annotated[Sequence[cname], MinLen(2)] = ["black", "steelblue"]
+    colors: Annotated[Sequence[cname | pname], MinLen(2)] = ["black", "steelblue"]
     positions: Annotated[Sequence[Annotated[float, Ge(0), Le(1)]], Len(len(colors))] = [
         0,
         1,
@@ -64,7 +64,7 @@ class Frame(Model):
     pts: list[Point]
 
 
-ColorOptions = Union[ColorScheme, cname]
+ColorOptions = Union[ColorScheme, cname, pname]
 
 
 class axes(Model):
@@ -83,13 +83,26 @@ class axes(Model):
     data: list[Frame] | list[Histogram] | str | None = None
     options: fig = fig()
 
-    def cmap(self, colors="steelblue", positions=[1]):
+    def cmap(
+        self,
+        colors: Annotated[Sequence[cname], MinLen(2)] = ["black", "white"],
+        positions: Annotated[Sequence[Annotated[float, Ge(0), Le(1)]], MinLen(2)] = [
+            0,
+            1,
+        ],
+    ):
         """
         Set the color map for the axes.
 
         :param colors: The colors to use in the color scheme.
         :param positions: The positions corresponding to the colors.
         """
+        output = list()
+        for color in colors:
+            if color in pname:
+                output.append(pythontocss[color])
+            else:
+                output.append(color)
         self.color_scheme = ColorScheme(colors=colors, positions=positions)
         return
 

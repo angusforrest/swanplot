@@ -1,5 +1,18 @@
 from typing import Sequence, Literal
 
+pname = Literal["b", "c", "g", "k", "m", "r", "w", "y"]
+pythontocss = dict(
+    {
+        "b": "blue",
+        "c": "cyan",
+        "g": "green",
+        "b": "black",
+        "m": "magenta",
+        "r": "red",
+        "w": "white",
+        "y": "yellow",
+    }
+)
 cname = Literal[
     "aliceblue",
     "antiquewhite",
