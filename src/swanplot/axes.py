@@ -189,12 +189,10 @@ class axes:
             case "y" | 2:
                 self.options.y_axis = input
 
-    StringInput = str | Annotated[Sequence[str],MaxLen(3)]
-    AxesInput = DataAxes | Annotated[Sequence[DataAxes],MaxLen(3)]
+    StringInput = str | Annotated[Sequence[str], MaxLen(3)]
+    AxesInput = DataAxes | Annotated[Sequence[DataAxes], MaxLen(3)]
 
-    def set_label(
-        self, string: StringInput, axis: AxesInput
-    ):
+    def set_label(self, string: StringInput, axis: AxesInput):
         """
         Set the label for the specified axis.
 
@@ -205,14 +203,22 @@ class axes:
         :param axis: The axis for which to set the label. Can be "t", "x", "y",
                      or their corresponding integer values (0, 1, 2).
         """
-        for 
-        match axis:
-            case "t" | 0:
-                self.options.t_label = string
-            case "x" | 1:
-                self.options.x_label = string
-            case "y" | 2:
-                self.options.y_label = string
+        if isinstance(string, Sequence) != isinstance(axis, Sequence):
+            raise Exception("Provided a list and a single value for string and axis")
+        if isinstance(string, Sequence) and isinstance(axis, Sequence):
+            if len(string) != len(axis):
+                raise Exception("Provided string and axis are not of the same length")
+        input = [string] if isinstance(string, str) else string
+        axes = [axis] if isinstance(axis, DataAxes) else axis
+
+        for a, b in zip(input, axes):
+            match b:
+                case "t" | 0:
+                    self.options.t_label = a
+                case "x" | 1:
+                    self.options.x_label = a
+                case "y" | 2:
+                    self.options.y_label = a
 
     def set_loop(self, loop: bool = True):
         """
