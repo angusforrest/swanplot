@@ -24,7 +24,8 @@ dev = [
 ]
 
 [project.optional-dependencies]
-docs = ["sphinx>=7.2.6", "pandoc", "myst-nb", "sphinx-book-theme", "ipython"]
+docs = [
+"sphinx>=7.2.6", "pandoc", "myst-nb", "sphinx-book-theme", "ipython","autodoc_pydantic"]
 
 
 
