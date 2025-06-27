@@ -69,10 +69,10 @@ class axes(Model):
     A class to represent axes for plotting data.
 
     Attributes:
-        color_scheme (ColorScheme | cname): The color scheme for the axes.
-        type (Literal["frame", "histogram"] | None): The type of data being plotted.
-        data (list[Frame] | list[Histogram] | str | None): The data to be plotted.
-        options (fig): Configuration options for the figure.
+        color_scheme (ColorScheme | cname): The color scheme for the axes. :no-index:
+        type (Literal["frame", "histogram"] | None): The type of data being plotted. :no-index:
+        data (list[Frame] | list[Histogram] | str | None): The data to be plotted. :no-index:
+        options (fig): Configuration options for the figure. :no-index:
     """
 
     color_scheme: ColorScheme | cname = "steelblue"

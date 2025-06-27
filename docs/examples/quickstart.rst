@@ -4,6 +4,7 @@ Example
 =======
 
 .. code-block:: python
+
 	def example_histogram():
 	    c = 600
 	    d = int(c**2)
