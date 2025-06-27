@@ -57,10 +57,10 @@ class axes:
         A class to represent axes for plotting data.
 
         Attributes:
-            color_scheme (ColorScheme | cname): The color scheme for the axes.
-            type (Literal["frame", "histogram"] | None): The type of data being plotted.
-            data (list[Frame] | list[Histogram] | str | None): The data to be plotted.
-            options (fig): Configuration options for the figure.
+            color_scheme: The color scheme for the axes.
+            type: The type of data being plotted.
+            data: The data to be plotted.
+            options: Configuration options for the figure.
         """
 
         self.color_scheme: ColorScheme = ColorScheme()
