@@ -4,7 +4,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
-    "sphix_autodoc_typehints",
+    "sphinx_autodoc_typehints",
     "autodocsumm",
     "myst_nb",
     "IPython.sphinxext.ipython_console_highlighting",
