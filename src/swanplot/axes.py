@@ -47,10 +47,10 @@ class Fig(Model):
 
 ColorStrings = Annotated[Sequence[cname | pname], MinLen(2)]
 IntensityValues = Annotated[Sequence[Annotated[float, Ge(0), Le(1)]], MinLen(2)]
-
 GraphTypes = Literal["histogram"]
-
 DataAxes = Union[Literal["x", "y", "t"], Literal[0, 1, 2]]
+StringInput = str | Annotated[Sequence[str], MaxLen(3)]
+AxesInput = DataAxes | Annotated[Sequence[DataAxes], MaxLen(3)]
 
 
 class axes:
@@ -188,9 +188,6 @@ class axes:
                 self.options.x_axis = input
             case "y" | 2:
                 self.options.y_axis = input
-
-    StringInput = str | Annotated[Sequence[str], MaxLen(3)]
-    AxesInput = DataAxes | Annotated[Sequence[DataAxes], MaxLen(3)]
 
     def set_label(self, string: StringInput, axis: AxesInput):
         """
