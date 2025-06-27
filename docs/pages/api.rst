@@ -8,5 +8,5 @@ Detailed API documentation
     :autosummary:
 
 
-.. autoclass:: Axes
+.. autoclass:: axes
     :undoc-members:
