@@ -23,6 +23,12 @@ dev = [
     "pytest>=8.4.1",
 ]
 
+[project.optional-dependencies]
+docs = ["sphinx>=7.2.6", "pandoc", "myst-nb", "sphinx-book-theme", "ipython"]
+
+
+
+
 [project.urls]
 Documentation = "https://github.com/angusforrest/swanplot#readme"
 Issues = "https://github.com/angusforrest/swanplot/issues"
