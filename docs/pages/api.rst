@@ -3,4 +3,4 @@
 Detailed API documentation
 ==========================
 
-.. autoclass:: Axes
+.. autoclass:: axes
