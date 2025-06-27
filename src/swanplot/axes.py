@@ -1,9 +1,11 @@
+from __future__ import annotations
 from pydantic import BaseModel, ConfigDict
 from annotated_types import Union, Gt, Ge, Lt, Le, Len, MinLen
 from typing import Annotated, Sequence, Literal
 import json
 import numpy as np
 import base64
+import os.path
 from swanplot.cname import cname, pname, pythontocss
 from PIL import Image
 import io
@@ -98,7 +100,6 @@ class axes:
     def hist(
         self,
         datacube: np.ndarray,
-        temp_tiff: bool = False,
     ):
         """
         Create a histogram from the data.
@@ -111,9 +112,6 @@ class axes:
             ims.append(Image.fromarray((datacube[t, ...]).astype(np.uint8), mode="L"))
         output = io.BytesIO()
         ims[0].save(output, "tiff", save_all=True, append_images=ims[1:])
-        if temp_tiff:
-            with open("test.tiff", "wb") as file:
-                file.write(output.getvalue())
         self.data = base64.b64encode(output.getvalue()).decode("utf-8")
         extremes = np.array([i.getextrema() for i in ims])
         self.options.max_intensity = int(extremes.max())
@@ -180,7 +178,7 @@ class axes:
             case "y" | 2:
                 self.options.y_axis = input
 
-    def custom_ticks(self, input: Sequence[float], axis: DataAxes = "x"):
+    def custom_ticks(self, input: Sequence[float], axis: DataAxes):
         if self.options.timesteps == None:
             raise Exception(
                 f"Data has not been loaded and therefore ticks number cannot be verified"
@@ -226,11 +224,8 @@ class axes:
 
     def cmap(
         self,
-        colors: ColorStrings = ["black", "white"],
-        positions: IntensityValues = [
-            0,
-            1,
-        ],
+        colors: ColorStrings,
+        positions: IntensityValues,
     ):
         """
         Set the color map for the axes.
@@ -255,8 +250,9 @@ class axes:
     def savefig(
         self,
         fname: str,
-        style: Literal["pretty", "compact"] = "pretty",
-        format: Literal["json"] = "json",
+        style: Literal["pretty", "compact"] = "compact",
+        format: Literal["json", "tiff"] = "json",
+        force: bool = False,
         print_website: bool = True,
     ):
         """
@@ -267,14 +263,24 @@ class axes:
         :param format: The format to save the figure in (currently only json).
         :param print_website: If True, prints a message with the upload link.
         """
-        with open(fname, "w") as file:
-            indentation: int
-            match style:
-                case "pretty":
-                    indentation = 4
-                case "compact":
-                    indentation = 0
-            output = json.dumps(self.model_dump(), indent=indentation)
-            file.write(output)
-            if print_website:
-                print(f"upload {fname} to https://animate.deno.dev")
+        ext = os.path.splitext(fname)[1]
+        if not force and ext != format and ext != "":
+            raise Exception(
+                f"you choose the format {format} but your file extension is {ext}"
+            )
+        match format:
+            case "tiff":
+                with open(fname, "wb") as file:
+                    file.write(base64.b64decode(self.data))
+            case "json":
+                with open(fname, "w") as file:
+                    indentation: int
+                    match style:
+                        case "pretty":
+                            indentation = 4
+                        case "compact":
+                            indentation = 0
+                    output = json.dumps(self.model_dump(), indent=indentation)
+                    file.write(output)
+                    if print_website:
+                        print(f"upload {fname} to https://animate.deno.dev")
