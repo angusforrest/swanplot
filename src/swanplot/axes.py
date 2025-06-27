@@ -13,11 +13,6 @@ class Model(BaseModel):
     model_config = ConfigDict(extra="forbid", validate_default=True)
 
 
-class Histogram(Model):
-    timestep: Annotated[int, Ge(0)]
-    bins: list[Sequence[int | float]]
-
-
 class ColorScheme(Model):
     colors: Annotated[Sequence[cname], MinLen(2)] = ["black", "white"]
     positions: Annotated[Sequence[Annotated[float, Ge(0), Le(1)]], Len(len(colors))] = [
@@ -26,20 +21,14 @@ class ColorScheme(Model):
     ]
 
 
-class AxisBounds(Model):
-    start: float = 0
-    end: float = 1
-    length: float = 1
-
-
 class Fig(Model):
     compact: bool = False
     time_unit: str = ""
     x_unit: str = ""
     y_unit: str = ""
-    t_axis: Sequence[float] | AxisBounds | None = None
-    x_axis: AxisBounds | None = None
-    y_axis: AxisBounds | None = None
+    t_axis: Sequence[float] | None = None
+    x_axis: Sequence[float] | None = None
+    y_axis: Sequence[float] | None = None
     x_bins: int | None = None
     y_bins: int | None = None
     max_points: int | None = None
@@ -54,20 +43,10 @@ class Fig(Model):
     loop: bool = False
 
 
-class Point(Model):
-    x: float
-    y: float
-
-
-class Frame(Model):
-    timestep: Annotated[int, Ge(0)]
-    pts: list[Point]
-
-
 ColorStrings = Annotated[Sequence[cname | pname], MinLen(2)]
 IntensityValues = Annotated[Sequence[Annotated[float, Ge(0), Le(1)]], MinLen(2)]
 
-GraphTypes = Literal["frame", "histogram"]
+GraphTypes = Literal["histogram"]
 
 DataAxes = Union[Literal["x", "y", "t"], Literal[0, 1, 2]]
 
@@ -123,71 +102,56 @@ class axes:
         :param a: A 2D NumPy array where each column represents a point in
                   the format [timestep, x, y].
         """
-        pts = dict()
-        frames = list()
-        for i in range(a.shape[1]):
-            t = float(a[0, i])
-            x = float(a[1, i])
-            y = float(a[2, i])
-            if t in pts.keys():
-                pts.update({float(t): [*pts[t], Point(x=x, y=y)]})
-            else:
-                pts.update({float(t): Point(x=x, y=y)})
-        print(pts)
-        for t in pts.keys():
-            frames.append(Frame(timestep=t, pts=pts[t]))
-        self.data = frames
-        self.type = "frame"
-        return
+        # pts = dict()
+        # frames = list()
+        # for i in range(a.shape[1]):
+        #     t = float(a[0, i])
+        #     x = float(a[1, i])
+        #     y = float(a[2, i])
+        #     if t in pts.keys():
+        #         pts.update({float(t): [*pts[t], Point(x=x, y=y)]})
+        #     else:
+        #         pts.update({float(t): Point(x=x, y=y)})
+        # print(pts)
+        # for t in pts.keys():
+        #     frames.append(Frame(timestep=t, pts=pts[t]))
+        # self.data = frames
+        # self.type = "frame"
+        # return
 
     def hist(
         self,
-        a: np.ndarray,
-        compact: bool = True,
+        datacube: np.ndarray,
         temp_tiff: bool = False,
     ):
         """
         Create a histogram from the data.
 
-        :param a: A 3D NumPy array representing the image data.
-        :param compact: If True, saves the histogram in a compact format.
+        :param datacube: A 3D NumPy array representing the image data.
         :param temp_tiff: If True, saves a temporary TIFF file.
         """
-        if compact == True:
-            ims = list()
-            for t in range(a.shape[0]):
-                ims.append(Image.fromarray((a[t, ...]).astype(np.uint8), mode="L"))
-            output = io.BytesIO()
-            ims[0].save(output, "tiff", save_all=True, append_images=ims[1:])
-            if temp_tiff:
-                with open("test.tiff", "wb") as file:
-                    file.write(output.getvalue())
-            self.data = base64.b64encode(output.getvalue()).decode("utf-8")
-            extremes = np.array([i.getextrema() for i in ims])
-            self.options.max_intensity = int(extremes.max())
-            self.options.min_intensity = int(extremes.min())
-            self.options.compact = compact
-        else:
-            hist = list()
-            for t in range(a.shape[0]):
-                bins = list()
-                for i in range(a.shape[1]):
-                    for j in range(a.shape[2]):
-                        if a[t, i, j] != 0:
-                            bins.append([i, j, a[t, i, j]])
-                hist.append(Histogram(timestep=t, bins=bins))
-            self.data = hist
-            self.options.max_intensity = a.max()
-            self.options.min_intensity = a.min()
+        ims = list()
+        for t in range(datacube.shape[0]):
+            ims.append(Image.fromarray((datacube[t, ...]).astype(np.uint8), mode="L"))
+        output = io.BytesIO()
+        ims[0].save(output, "tiff", save_all=True, append_images=ims[1:])
+        if temp_tiff:
+            with open("test.tiff", "wb") as file:
+                file.write(output.getvalue())
+        self.data = base64.b64encode(output.getvalue()).decode("utf-8")
+        extremes = np.array([i.getextrema() for i in ims])
+        self.options.max_intensity = int(extremes.max())
+        self.options.min_intensity = int(extremes.min())
+        self.options.compact = True
         if self.options.t_axis == None:
-            self.t_axis(start=0, end=a.shape[0] - 1)
-        self.options.timesteps = a.shape[0]
+            self.t_axis(start=0, end=datacube.shape[0] - 1)
+        self.options.timesteps = datacube.shape[0]
         if self.options.x_axis == None:
-            self.x_axis(start=0, end=a.shape[1])
-        self.options.x_bins = a.shape[1]
+            self.x_axis(start=0, end=datacube.shape[1])
+        self.options.x_bins = datacube.shape[1]
         if self.options.y_axis == None:
-            self.y_axis(start=0, end=a.shape[2])
-        self.options.y_bins = a.shape[2]
+            self.y_axis(start=0, end=datacube.shape[2])
+        self.options.y_bins = datacube.shape[2]
         self.type = "histogram"
         return
 
@@ -256,21 +220,14 @@ class axes:
         """
         self.options.t_axis = np.linspace(start, end, self.options.timesteps)
 
-    def set_xlabel(self, string: str):
-        """
-        Set the label for the x-axis.
-
-        :param string: The label to set for the x-axis.
-        """
-        self.options.x_label = string
-
-    def set_ylabel(self, string: str):
-        """
-        Set the label for the y-axis.
-
-        :param string: The label to set for the y-axis.
-        """
-        self.options.y_label = string
+    def set_label(self, string: str, axis: DataAxes = "x"):
+        match axis:
+            case "t" | 0:
+                self.options.t_label = string
+            case "x" | 1:
+                self.options.x_label = string
+            case "y" | 2:
+                self.options.y_label = string
 
     def set_loop(self, loop: bool = True):
         """
