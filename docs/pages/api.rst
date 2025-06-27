@@ -3,4 +3,7 @@
 Detailed API documentation
 ==========================
 
+.. automodule: swanplot.axes
+    :autosummary:
+
 .. autoclass:: axes
