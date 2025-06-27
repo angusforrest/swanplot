@@ -1,14 +1,15 @@
 [project]
 name = "swanplot"
-version = "0.1.0"
+version = "0.1.3"
 description = "Add your description here"
 readme = "README.md"
 authors = [
     { name = "angusforrest", email = "contact@angusforrest.com" }
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
-    "numpy>=2.3.0",
+    "numpy>=1.26",
+    "pillow>=11.2.1",
     "pydantic>=2.11.7",
 ]
 

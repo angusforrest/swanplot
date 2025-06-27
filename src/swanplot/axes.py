@@ -1,30 +1,28 @@
 from pydantic import BaseModel, ConfigDict
-from annotated_types import Gt, Ge, Lt, Le, Unit, Len
+from annotated_types import Gt, Ge, Lt, Le, Len, MinLen
 from typing import Annotated, Sequence, Literal
 import json
 import numpy as np
+import base64
 from swanplot.cname import cname
+from PIL import Image
+import io
 
 
 class Model(BaseModel):
     model_config = ConfigDict(extra="forbid", validate_default=True)
 
 
-class Bin(Model):
-    i: Annotated[int, Ge(0)]
-    j: Annotated[int, Ge(0)]
-    num: Annotated[int, Ge(0)]
-
-
 class Histogram(Model):
     timestep: Annotated[int, Ge(0)]
-    bins: list[Bin]
+    bins: list[Sequence[int | float]]
 
 
 class ColorScheme(Model):
-    colors: Sequence[cname] = ["blue"]
+    colors: Annotated[Sequence[cname], MinLen(2)] = ["black", "steelblue"]
     positions: Annotated[Sequence[Annotated[float, Ge(0), Le(1)]], Len(len(colors))] = [
-        0
+        0,
+        1,
     ]
 
 
@@ -35,10 +33,11 @@ class axisBounds(Model):
 
 
 class fig(Model):
+    compact: bool = False
     time_unit: str = ""
     x_unit: str = ""
     y_unit: str = ""
-    t_axis: axisBounds | None = None
+    t_axis: Sequence[float] | axisBounds | None = None
     x_axis: axisBounds | None = None
     y_axis: axisBounds | None = None
     x_bins: int | None = None
@@ -66,12 +65,12 @@ class Frame(Model):
 
 
 class axes(Model):
-    color_scheme: ColorScheme | cname = "blue"
+    color_scheme: ColorScheme | cname = "steelblue"
     type: Literal["frame", "histogram"] | None = None
-    data: list[Frame] | list[Histogram] | None = None
+    data: list[Frame] | list[Histogram] | str | None = None
     options: fig = fig()
 
-    def cmap(self, colors="blue", positions=[1]):
+    def cmap(self, colors="steelblue", positions=[1]):
         self.color_scheme = ColorScheme(colors=colors, positions=positions)
         return
 
@@ -96,18 +95,34 @@ class axes(Model):
         self.type = "frame"
         return
 
-    def hist(self, a: np.ndarray):
-        hist = list()
-        for t in range(a.shape[0]):
-            bins = list()
-            for i in range(a.shape[1]):
-                for j in range(a.shape[2]):
-                    if a[t, i, j] != 0:
-                        bins.append(Bin(i=i, j=j, num=int(a[t, i, j])))
-            hist.append(Histogram(timestep=t, bins=bins))
-        self.data = hist
+    def hist(self, a: np.ndarray, compact: bool = False):
+        if compact == True:
+            ims = list()
+            for t in range(a.shape[0]):
+                ims.append(Image.fromarray((a[t, ...]).astype(np.uint8), mode="L"))
+            output = io.BytesIO()
+            ims[0].save(output, "tiff", save_all=True, append_images=ims[1:])
+            with open("test.tiff", "wb") as file:
+                file.write(output.getvalue())
+            self.data = base64.b64encode(output.getvalue()).decode("utf-8")
+            extremes = np.array([i.getextrema() for i in ims])
+            self.options.max_intensity = int(extremes.max())
+            self.options.min_intensity = int(extremes.min())
+            self.options.compact = compact
+        else:
+            hist = list()
+            for t in range(a.shape[0]):
+                bins = list()
+                for i in range(a.shape[1]):
+                    for j in range(a.shape[2]):
+                        if a[t, i, j] != 0:
+                            bins.append([i, j, a[t, i, j]])
+                hist.append(Histogram(timestep=t, bins=bins))
+            self.data = hist
+            self.options.max_intensity = a.max()
+            self.options.min_intensity = a.min()
         if self.options.t_axis == None:
-            self.t_axis(start=0, end=a.shape[0])
+            self.t_axis(start=0, end=a.shape[0] - 1)
         self.options.timesteps = a.shape[0]
         if self.options.x_axis == None:
             self.x_axis(start=0, end=a.shape[1])
@@ -115,19 +130,17 @@ class axes(Model):
         if self.options.y_axis == None:
             self.y_axis(start=0, end=a.shape[2])
         self.options.y_bins = a.shape[2]
-        self.options.max_intensity = a.max()
-        self.options.min_intensity = a.min()
         self.type = "histogram"
         return
 
-    def x_unit(self, x: str):
-        self.options.x_unit = x
+    def x_unit(self, unit: str = ""):
+        self.options.x_unit = unit
 
-    def y_unit(self, y: str):
-        self.options.y_unit = y
+    def y_unit(self, unit: str = ""):
+        self.options.y_unit = unit
 
-    def t_unit(self, t: str):
-        self.options.time_unit = t
+    def t_unit(self, unit: str = ""):
+        self.options.time_unit = unit
 
     def y_axis(self, start: float, end: float):
         self.options.y_axis = axisBounds(start=start, end=end, length=end - start)
