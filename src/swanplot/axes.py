@@ -131,11 +131,16 @@ class axes:
         self.type = "histogram"
         return
 
-    def set_unit(self, unit: str = "", axis: DataAxes = "x"):
+    def set_unit(self, unit: str, axis: DataAxes):
         """
-        Set the unit for the x-axis.
+        Set the unit for the specified axis.
 
-        :param unit: The unit to set for the x-axis.
+        This method updates the unit of measurement for the specified axis
+        (time, x, or y) in the figure options.
+
+        :param unit: The unit to set for the specified axis.
+        :param axis: The axis for which to set the unit. Can be "t", "x", "y",
+                     or their corresponding integer values (0, 1, 2).
         """
         match axis:
             case "t" | 0:
@@ -149,13 +154,18 @@ class axes:
         self,
         start: float,
         end: float,
-        axis: DataAxes = "x",
+        axis: DataAxes,
     ):
         """
-        Set the bounds for the x-axis.
+        Set uniform ticks for the specified axis.
 
-        :param start: The start value for the x-axis.
-        :param end: The end value for the x-axis.
+        This method generates evenly spaced ticks between the specified start
+        and end values for the given axis.
+
+        :param start: The start value for the axis.
+        :param end: The end value for the axis.
+        :param axis: The axis for which to set the ticks. Can be "t", "x", "y",
+                     or their corresponding integer values (0, 1, 2).
         """
         if self.options.timesteps == None:
             raise Exception(
@@ -187,16 +197,17 @@ class axes:
             case "y" | 2:
                 self.options.y_axis = input
 
-    def uniform_t_ticks(self, start: float, end: float):
+    def set_label(self, string: str, axis: DataAxes):
         """
-        Set the bounds for the time axis.
+        Set the label for the specified axis.
 
-        :param start: The start value for the time axis.
-        :param end: The end value for the time axis.
+        This method updates the label for the specified axis (time, x, or y)
+        in the figure options.
+
+        :param string: The label to set for the specified axis.
+        :param axis: The axis for which to set the label. Can be "t", "x", "y",
+                     or their corresponding integer values (0, 1, 2).
         """
-        self.options.t_axis = np.linspace(start, end, self.options.timesteps)
-
-    def set_label(self, string: str, axis: DataAxes = "x"):
         match axis:
             case "t" | 0:
                 self.options.t_label = string
@@ -224,9 +235,13 @@ class axes:
         """
         Set the color map for the axes.
 
-        :param colors: The colors to use in the color scheme.
+        This method defines the color scheme for the plot by specifying the
+        colors and their corresponding positions in the color map.
 
-        :param positions: The positions corresponding to the colors.
+        :param colors: A sequence of colors to use in the color scheme.
+                       Can include color names or CSS color values.
+        :param positions: A sequence of float values representing the positions
+                          corresponding to the colors, ranging from 0 to 1.
         """
         output = list()
         for color in colors:
