@@ -67,7 +67,7 @@ class Frame(Model):
 ColorOptions = Union[ColorScheme, cname, pname]
 
 
-class axes(Model):
+class axes:
     """
     A class to represent axes for plotting data.
 
@@ -78,10 +78,11 @@ class axes(Model):
         options (fig): Configuration options for the figure. :noindex:
     """
 
-    color_scheme: ColorOptions = "steelblue"
-    type: Literal["frame", "histogram"] | None = None
-    data: list[Frame] | list[Histogram] | str | None = None
-    options: fig = fig()
+    def __init__(self):
+        self.color_scheme: ColorOptions = "steelblue"
+        self.type: Literal["frame", "histogram"] | None = None
+        self.data: list[Frame] | list[Histogram] | str | None = None
+        self.options: fig = fig()
 
     def cmap(
         self,
