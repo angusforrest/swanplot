@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from annotated_types import Gt, Ge, Lt, Le, Len, MinLen
+from annotated_types import Union, Gt, Ge, Lt, Le, Len, MinLen
 from typing import Annotated, Sequence, Literal
 import json
 import numpy as np
@@ -64,6 +64,9 @@ class Frame(Model):
     pts: list[Point]
 
 
+ColorOptions = Union[ColorScheme, cname]
+
+
 class axes(Model):
     """
     A class to represent axes for plotting data.
@@ -75,7 +78,7 @@ class axes(Model):
         options (fig): Configuration options for the figure. :no-index:
     """
 
-    color_scheme: ColorScheme | cname = "steelblue"
+    color_scheme: ColorOptions = "steelblue"
     type: Literal["frame", "histogram"] | None = None
     data: list[Frame] | list[Histogram] | str | None = None
     options: fig = fig()
