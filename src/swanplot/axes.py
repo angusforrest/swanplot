@@ -19,27 +19,27 @@ class Histogram(Model):
 
 
 class ColorScheme(Model):
-    colors: Annotated[Sequence[cname | pname], MinLen(2)] = ["black", "steelblue"]
+    colors: Annotated[Sequence[cname], MinLen(2)] = ["black", "white"]
     positions: Annotated[Sequence[Annotated[float, Ge(0), Le(1)]], Len(len(colors))] = [
         0,
         1,
     ]
 
 
-class axisBounds(Model):
+class AxisBounds(Model):
     start: float = 0
     end: float = 1
     length: float = 1
 
 
-class fig(Model):
+class Fig(Model):
     compact: bool = False
     time_unit: str = ""
     x_unit: str = ""
     y_unit: str = ""
-    t_axis: Sequence[float] | axisBounds | None = None
-    x_axis: axisBounds | None = None
-    y_axis: axisBounds | None = None
+    t_axis: Sequence[float] | AxisBounds | None = None
+    x_axis: AxisBounds | None = None
+    y_axis: AxisBounds | None = None
     x_bins: int | None = None
     y_bins: int | None = None
     max_points: int | None = None
@@ -64,7 +64,12 @@ class Frame(Model):
     pts: list[Point]
 
 
-ColorOptions = Union[ColorScheme, cname, pname]
+ColorStrings = Annotated[Sequence[cname | pname], MinLen(2)]
+IntensityValues = Annotated[Sequence[Annotated[float, Ge(0), Le(1)]], MinLen(2)]
+
+GraphTypes = Literal["frame", "histogram"]
+
+DataAxes = Union[Literal["x", "y", "t"], Literal[0, 1, 2]]
 
 
 class axes:
@@ -72,22 +77,22 @@ class axes:
     A class to represent axes for plotting data.
 
     Attributes:
-        color_scheme (ColorScheme | cname): The color scheme for the axes. :noindex:
-        type (Literal["frame", "histogram"] | None): The type of data being plotted. :noindex:
-        data (list[Frame] | list[Histogram] | str | None): The data to be plotted. :noindex:
-        options (fig): Configuration options for the figure. :noindex:
+        color_scheme (ColorScheme | cname): The color scheme for the axes.
+        type (Literal["frame", "histogram"] | None): The type of data being plotted.
+        data (list[Frame] | list[Histogram] | str | None): The data to be plotted.
+        options (fig): Configuration options for the figure.
     """
 
     def __init__(self):
-        self.color_scheme: ColorOptions = "steelblue"
-        self.type: Literal["frame", "histogram"] | None = None
-        self.data: list[Frame] | list[Histogram] | str | None = None
-        self.options: fig = fig()
+        self.color_scheme: ColorScheme = ColorScheme()
+        self.type: GraphTypes | None = None
+        self.data: str | None = None
+        self.options: Fig = Fig()
 
     def cmap(
         self,
-        colors: Annotated[Sequence[cname], MinLen(2)] = ["black", "white"],
-        positions: Annotated[Sequence[Annotated[float, Ge(0), Le(1)]], MinLen(2)] = [
+        colors: ColorStrings = ["black", "white"],
+        positions: IntensityValues = [
             0,
             1,
         ],
@@ -108,7 +113,7 @@ class axes:
         self.color_scheme = ColorScheme(colors=colors, positions=positions)
         return
 
-    def plot(
+    def _plot(
         self,
         a: np.ndarray,
     ):
@@ -186,56 +191,70 @@ class axes:
         self.type = "histogram"
         return
 
-    def x_unit(self, unit: str = ""):
+    def set_unit(self, unit: str = "", axis: DataAxes = "x"):
         """
         Set the unit for the x-axis.
 
         :param unit: The unit to set for the x-axis.
         """
-        self.options.x_unit = unit
+        match axis:
+            case "t" | 0:
+                self.options.t_unit = unit
+            case "x" | 1:
+                self.options.x_unit = unit
+            case "y" | 2:
+                self.options.y_unit = unit
 
-    def y_unit(self, unit: str = ""):
-        """
-        Set the unit for the y-axis.
-
-        :param unit: The unit to set for the y-axis.
-        """
-        self.options.y_unit = unit
-
-    def t_unit(self, unit: str = ""):
-        """
-        Set the unit for the time axis.
-
-        :param unit: The unit to set for the time axis.
-        """
-        self.options.time_unit = unit
-
-    def y_axis(self, start: float, end: float):
-        """
-        Set the bounds for the y-axis.
-
-        :param start: The start value for the y-axis.
-        :param end: The end value for the y-axis.
-        """
-        self.options.y_axis = axisBounds(start=start, end=end, length=end - start)
-
-    def x_axis(self, start: float, end: float):
+    def uniform_ticks(
+        self,
+        start: float,
+        end: float,
+        axis: DataAxes = "x",
+    ):
         """
         Set the bounds for the x-axis.
 
         :param start: The start value for the x-axis.
         :param end: The end value for the x-axis.
         """
-        self.options.x_axis = axisBounds(start=start, end=end, length=end - start)
+        if self.options.timesteps == None:
+            raise Exception(
+                f"Data has not been loaded and therefore ticks number cannot be verified"
+            )
+        input = np.linspace(start, end, self.options.timesteps).tolist()
+        match axis:
+            case "t" | 0:
+                self.option.t_axis = input
+            case "x" | 1:
+                self.options.x_axis = input
+            case "y" | 2:
+                self.options.y_axis = input
 
-    def t_axis(self, start: float, end: float):
+    def custom_ticks(self, input: Sequence[float], axis: DataAxes = "x"):
+        if self.options.timesteps == None:
+            raise Exception(
+                f"Data has not been loaded and therefore ticks number cannot be verified"
+            )
+        if len(input) != self.options.timesteps:
+            raise Exception(
+                f"The length of provided ticks is not the same as the number of timesteps in your data {self.options.timesteps}"
+            )
+        match axis:
+            case "t" | 0:
+                self.option.t_axis = input
+            case "x" | 1:
+                self.options.x_axis = input
+            case "y" | 2:
+                self.options.y_axis = input
+
+    def uniform_t_ticks(self, start: float, end: float):
         """
         Set the bounds for the time axis.
 
         :param start: The start value for the time axis.
         :param end: The end value for the time axis.
         """
-        self.options.t_axis = axisBounds(start=start, end=end, length=end - start)
+        self.options.t_axis = np.linspace(start, end, self.options.timesteps)
 
     def set_xlabel(self, string: str):
         """
