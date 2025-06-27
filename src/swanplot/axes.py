@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pydantic import BaseModel, ConfigDict
-from annotated_types import Union, Gt, Ge, Lt, Le, Len, MinLen
+from annotated_types import Union, Gt, Ge, Lt, Le, Len, MinLen, MaxLen
 from typing import Annotated, Sequence, Literal
 import json
 import numpy as np
@@ -57,12 +57,6 @@ class axes:
     def __init__(self):
         """
         A class to represent axes for plotting data.
-
-        Attributes:
-            color_scheme: The color scheme for the axes.
-            type: The type of data being plotted.
-            data: The data to be plotted.
-            options: Configuration options for the figure.
         """
 
         self.color_scheme: ColorScheme = ColorScheme()
@@ -195,7 +189,12 @@ class axes:
             case "y" | 2:
                 self.options.y_axis = input
 
-    def set_label(self, string: str, axis: DataAxes):
+    StringInput = str | Annotated[Sequence[str],MaxLen(3)]
+    AxesInput = DataAxes | Annotated[Sequence[DataAxes],MaxLen(3)]
+
+    def set_label(
+        self, string: StringInput, axis: AxesInput
+    ):
         """
         Set the label for the specified axis.
 
@@ -206,6 +205,7 @@ class axes:
         :param axis: The axis for which to set the label. Can be "t", "x", "y",
                      or their corresponding integer values (0, 1, 2).
         """
+        for 
         match axis:
             case "t" | 0:
                 self.options.t_label = string
