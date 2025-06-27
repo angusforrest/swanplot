@@ -2,6 +2,8 @@ import importlib.metadata
 
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinxcontrib.apidoc",
+    "sphinxcontrib.autodoc_pydantic",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "myst_nb",
