@@ -65,12 +65,28 @@ class Frame(Model):
 
 
 class axes(Model):
+    """
+    A class to represent axes for plotting data.
+
+    Attributes:
+        color_scheme (ColorScheme | cname): The color scheme for the axes.
+        type (Literal["frame", "histogram"] | None): The type of data being plotted.
+        data (list[Frame] | list[Histogram] | str | None): The data to be plotted.
+        options (fig): Configuration options for the figure.
+    """
+
     color_scheme: ColorScheme | cname = "steelblue"
     type: Literal["frame", "histogram"] | None = None
     data: list[Frame] | list[Histogram] | str | None = None
     options: fig = fig()
 
     def cmap(self, colors="steelblue", positions=[1]):
+        """
+        Set the color map for the axes.
+
+        :param colors: The colors to use in the color scheme.
+        :param positions: The positions corresponding to the colors.
+        """
         self.color_scheme = ColorScheme(colors=colors, positions=positions)
         return
 
@@ -78,6 +94,12 @@ class axes(Model):
         self,
         a: np.ndarray,
     ):
+        """
+        Plot the data as frames.
+
+        :param a: A 2D NumPy array where each column represents a point in
+                  the format [timestep, x, y].
+        """
         pts = dict()
         frames = list()
         for i in range(a.shape[1]):
@@ -101,6 +123,13 @@ class axes(Model):
         compact: bool = True,
         temp_tiff: bool = False,
     ):
+        """
+        Create a histogram from the data.
+
+        :param a: A 3D NumPy array representing the image data.
+        :param compact: If True, saves the histogram in a compact format.
+        :param temp_tiff: If True, saves a temporary TIFF file.
+        """
         if compact == True:
             ims = list()
             for t in range(a.shape[0]):
@@ -140,30 +169,78 @@ class axes(Model):
         return
 
     def x_unit(self, unit: str = ""):
+        """
+        Set the unit for the x-axis.
+
+        :param unit: The unit to set for the x-axis.
+        """
         self.options.x_unit = unit
 
     def y_unit(self, unit: str = ""):
+        """
+        Set the unit for the y-axis.
+
+        :param unit: The unit to set for the y-axis.
+        """
         self.options.y_unit = unit
 
     def t_unit(self, unit: str = ""):
+        """
+        Set the unit for the time axis.
+
+        :param unit: The unit to set for the time axis.
+        """
         self.options.time_unit = unit
 
     def y_axis(self, start: float, end: float):
+        """
+        Set the bounds for the y-axis.
+
+        :param start: The start value for the y-axis.
+        :param end: The end value for the y-axis.
+        """
         self.options.y_axis = axisBounds(start=start, end=end, length=end - start)
 
     def x_axis(self, start: float, end: float):
+        """
+        Set the bounds for the x-axis.
+
+        :param start: The start value for the x-axis.
+        :param end: The end value for the x-axis.
+        """
         self.options.x_axis = axisBounds(start=start, end=end, length=end - start)
 
     def t_axis(self, start: float, end: float):
+        """
+        Set the bounds for the time axis.
+
+        :param start: The start value for the time axis.
+        :param end: The end value for the time axis.
+        """
         self.options.t_axis = axisBounds(start=start, end=end, length=end - start)
 
     def set_xlabel(self, string: str):
+        """
+        Set the label for the x-axis.
+
+        :param string: The label to set for the x-axis.
+        """
         self.options.x_label = string
 
     def set_ylabel(self, string: str):
+        """
+        Set the label for the y-axis.
+
+        :param string: The label to set for the y-axis.
+        """
         self.options.y_label = string
 
     def set_loop(self, loop: bool = True):
+        """
+        Set whether the plot should loop.
+
+        :param loop: If True, the plot will loop.
+        """
         self.options.loop = loop
 
     def savefig(
@@ -173,6 +250,14 @@ class axes(Model):
         format: Literal["json"] = "json",
         print_website: bool = True,
     ):
+        """
+        Save the figure to a file.
+
+        :param fname: The filename to save the figure to.
+        :param style: The style of the output (pretty or compact).
+        :param format: The format to save the figure in (currently only json).
+        :param print_website: If True, prints a message with the upload link.
+        """
         with open(fname, "w") as file:
             indentation: int
             match style:

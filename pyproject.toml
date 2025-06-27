@@ -30,7 +30,7 @@ docs = ["sphinx>=7.2.6", "pandoc", "myst-nb", "sphinx-book-theme", "ipython"]
 
 
 [project.urls]
-Documentation = "https://github.com/angusforrest/swanplot#readme"
+Documentation = "https://swanplot.readthedocs.io"
 Issues = "https://github.com/angusforrest/swanplot/issues"
 Source = "https://github.com/angusforrest/swanplot"
 
