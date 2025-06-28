@@ -43,6 +43,7 @@ nb_execution_mode = "force"
 html_sourcelink_suffix = ""
 autoclass_content = "both"
 napoleon_use_param = True
+napoleon_preprocess_types = True
 autodoc_default_options = {
     "autosummary": True,
     "members": True,
