@@ -27,9 +27,6 @@ dev = [
 docs = [
 "sphinx>=7.2.6", "pandoc", "myst-nb", "sphinx-book-theme", "ipython","sphinx-autodoc-typehints","autodocsumm"]
 
-
-
-
 [project.urls]
 Documentation = "https://swanplot.readthedocs.io"
 Issues = "https://github.com/angusforrest/swanplot/issues"
