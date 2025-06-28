@@ -47,6 +47,7 @@ napoleon_preprocess_types = True
 always_use_bars_union = True
 autodoc_typehints_format = "short"
 python_use_unqualified_type_names = True
+python_display_short_literal_types = True
 autodoc_default_options = {
     "autosummary": True,
     "members": True,

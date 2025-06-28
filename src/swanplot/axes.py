@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pydantic import BaseModel, ConfigDict
 from annotated_types import Union, Gt, Ge, Lt, Le, Len, MinLen, MaxLen
-from typing import Annotated, Sequence, Literal
+from typing import Annotated, Sequence, Literal, TypeAlias
 import json
 import numpy as np
 import base64
@@ -45,22 +45,24 @@ class Fig(Model):
     loop: bool = False
 
 
-ColorStrings = Annotated[Sequence[cname | pname], MinLen(2)]
+ColorStrings: TypeAlias = Annotated[Sequence[cname | pname], MinLen(2)]
 """type for cmap's input of color string sequence. Allows css color names and python single letter color names. Requires the sequence to be a minimum of two strings"""
 
-IntensityValues = Annotated[Sequence[Annotated[float, Ge(0), Le(1)]], MinLen(2)]
+IntensityValues: TypeAlias = Annotated[
+    Sequence[Annotated[float, Ge(0), Le(1)]], MinLen(2)
+]
 """type for cmap's input of positions float sequence. Allows floats in the closed interval between 0 and 1. Requires the sequence to be a minimum of two floats"""
 
-GraphTypes = Literal["histogram"]
+GraphTypes: TypeAlias = Literal["histogram"]
 """type for graphical representation"""
 
-DataAxes = Union[Literal["t", "x", "y"], Literal[0, 1, 2]]
+DataAxes: TypeAlias = Union[Literal["t", "x", "y"], Literal[0, 1, 2]]
 """type for datacube axes, allows the use of t,x,y or 0,1,2"""
 
-StringInput = str | Annotated[Sequence[str], MaxLen(3)]
+StringInput: TypeAlias = str | Annotated[Sequence[str], MaxLen(3)]
 """type for set_label's input string that allows a single string or a sequence of strings with a maximum length of 3"""
 
-AxesInput = DataAxes | Annotated[Sequence[DataAxes], MaxLen(3)]
+AxesInput: TypeAlias = DataAxes | Annotated[Sequence[DataAxes], MaxLen(3)]
 """type for set_label's input axis that allows for a single axis or a sequence of axes with a maximum length of 3 """
 
 
