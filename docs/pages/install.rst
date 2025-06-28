@@ -6,11 +6,11 @@ Installation
 Dependencies
 ------------
 
-LBParticles depends on ``numpy``, ``pillow`` and ``pydantic``. 
+swanplot depends on ``numpy``, ``pillow`` and ``pydantic``. 
 
 These will be installed automatically when you install swanplot through `pip <http://www.pip-installer.org/>`_.
 
-Using pip
+Using uv or pip
 ---------
 
 The easiest way to install the most recent stable version of ``swanplot`` is

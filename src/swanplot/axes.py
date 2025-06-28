@@ -25,7 +25,7 @@ class ColorScheme(Model):
 
 class Fig(Model):
     compact: bool = False
-    time_unit: str = ""
+    t_unit: str = ""
     x_unit: str = ""
     y_unit: str = ""
     c_unit: str = ""
@@ -43,6 +43,8 @@ class Fig(Model):
     timesteps: int = 1
     x_label: str = ""
     y_label: str = ""
+    t_label: str = ""
+    c_label: str = ""
     loop: bool = False
 
 
@@ -67,17 +69,16 @@ AxesInput: TypeAlias = DataAxes | Annotated[Sequence[DataAxes], MaxLen(4)]
 """type for set_label's input axis that allows for a single axis or a sequence of axes with a maximum length of 4"""
 
 
-class axes:
-    def __init__(self):
-        """
-        A class to represent axes for plotting data, including color schemes,
-        data options, and methods for plotting and saving figures.
-        """
+class axes(Model):
+    """
+    A class to represent axes for plotting data, including color schemes,
+    data options, and methods for plotting and saving figures.
+    """
 
-        self.color_scheme: ColorScheme = ColorScheme()
-        self.type: GraphTypes | None = None
-        self.data: str | None = None
-        self.options: Fig = Fig()
+    color_scheme: ColorScheme = ColorScheme()
+    type: GraphTypes | None = None
+    data: str | None = None
+    options: Fig = Fig()
 
     def _plot(
         self,
@@ -203,6 +204,8 @@ class axes:
                 self.options.x_unit = unit
             case "y" | 2:
                 self.options.y_unit = unit
+            case "c" | 3:
+                self.options.y_unit = unit
 
     def uniform_ticks(
         self,
@@ -230,11 +233,13 @@ class axes:
         input = np.linspace(start, end, self.options.timesteps).tolist()
         match axis:
             case "t" | 0:
-                self.option.t_axis = input
+                self.options.t_axis = input
             case "x" | 1:
                 self.options.x_axis = input
             case "y" | 2:
                 self.options.y_axis = input
+            case "c" | 3:
+                self.options.c_axis = input
 
     def custom_ticks(self, input: Sequence[float], axis: DataAxes):
         """
@@ -260,11 +265,13 @@ class axes:
             )
         match axis:
             case "t" | 0:
-                self.option.t_axis = input
+                self.options.t_axis = input
             case "x" | 1:
                 self.options.x_axis = input
             case "y" | 2:
                 self.options.y_axis = input
+            case "c" | 3:
+                self.options.c_axis = input
 
     def set_label(self, string: StringInput, axis: AxesInput):
         """
@@ -286,7 +293,7 @@ class axes:
             if len(string) != len(axis):
                 raise Exception("Provided string and axis are not of the same length")
         input = [string] if isinstance(string, str) else string
-        axes = [axis] if isinstance(axis, DataAxes) else axis
+        axes = [axis] if isinstance(axis, str) or isinstance(axis, int) else axis
 
         for a, b in zip(input, axes):
             match b:
@@ -337,7 +344,7 @@ class axes:
         self,
         fname: str,
         style: Literal["pretty", "compact"] = "compact",
-        format: Literal["json", "tiff"] = "json",
+        format: Literal["json", "tiff"] | None = None,
         force: bool = False,
         print_website: bool = True,
     ):
@@ -349,17 +356,29 @@ class axes:
 
         :param fname: The filename to save the figure to.
         :param style: The style of the output (pretty or compact).
-        :param format: The format to save the figure in (currently supports json and tiff).
+        :param format: The format to save the figure in (currently supports json and tiff) defaults to json if no extension is filename is bare.
         :param force: If True, allows saving with a different file extension than the specified format.
         :param print_website: If True, prints a message with the upload link after saving.
         :raises Exception: If the specified format does not match the file extension and force is False.
         """
         ext = os.path.splitext(fname)[1]
-        if not force and ext != format and ext != "":
+        if ext == "" and format == None:
+            input = "json"
+        if ext != "" and format == None:
+            if ext[1:] not in ["json", "tiff"] and not force:
+                raise Exception("extension provided is not a supported extension")
+            elif force:
+                input = "json"
+            else:
+                input = ext[1:]
+        input = ext[1:] if format == None else format
+        fname = fname + "." + str(format) if ext == "" else fname
+
+        if not force and ext != "." + input and ext != "":
             raise Exception(
                 f"you choose the format {format} but your file extension is {ext}"
             )
-        match format:
+        match input:
             case "tiff":
                 with open(fname, "wb") as file:
                     file.write(base64.b64decode(self.data))
