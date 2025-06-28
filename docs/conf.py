@@ -6,12 +6,15 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
+    "sphinxcontrib.autodoc_pydantic",
     "autodocsumm",
     "myst_nb",
     "IPython.sphinxext.ipython_console_highlighting",
 ]
 source_suffix = [".rst", ".md"]
 master_doc = "index"
+autodoc_pydantic_model_show_json = True
+autodoc_pydantic_settings_show_json = False
 
 # General information about the project.
 project = "swanplot"
