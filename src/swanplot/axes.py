@@ -66,11 +66,11 @@ This type permits float values within the closed interval [0, 1].
 The sequence must contain at least two float values to define positions effectively.
 """
 
-GraphTypes: TypeAlias = Literal["histogram"]
+GraphTypes: TypeAlias = Literal["2dhistogram"]
 """
 Type alias for specifying the type of graphical representation.
 
-Currently, this type supports only the "histogram" representation.
+Currently, this type supports only the "2dhistogram" representation.
 """
 
 DataAxes: TypeAlias = Union[Literal["t", "x", "y", "c"], Literal[0, 1, 2, 3]]
