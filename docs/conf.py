@@ -56,3 +56,11 @@ autodoc_default_options = {
     "exclude-members": "__weakref__",
     "private-members": False,
 }
+autodoc_type_aliases = dict(
+    ColorStrings="ColorStrings",
+    IntensityValues="IntensityValues",
+    GraphTypes="GraphTypes",
+    DataAxes="DataAxes",
+    StringInput="StringInput",
+    AxesInput="AxesInput",
+)
