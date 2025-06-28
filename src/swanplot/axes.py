@@ -1,3 +1,7 @@
+"""
+Axes Module
+"""
+
 from __future__ import annotations
 from pydantic import BaseModel, ConfigDict
 from annotated_types import Union, Gt, Ge, Lt, Le, Len, MinLen, MaxLen
@@ -104,7 +108,7 @@ class axes(Model):
                 if datacube.shape[2] >= 256
                 else 256 + 2 * self.options.margin
             )
-        self.type = "histogram"
+        self.type = "2dhistogram"
         return
 
     def figsize(
