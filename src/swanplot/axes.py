@@ -104,6 +104,7 @@ class axes(Model):
     """
     A class to represent axes for plotting data, including color schemes,
     data options, and methods for plotting and saving figures.
+
     """
 
     color_scheme: ColorScheme = ColorScheme()
