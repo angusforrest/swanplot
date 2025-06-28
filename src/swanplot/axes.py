@@ -113,10 +113,11 @@ class axes:
         """
         Create a histogram from the provided 3D image data.
 
-        :param datacube: A 3D NumPy array representing the image data, where
-                         the first dimension corresponds to timesteps.
         This method generates a TIFF image from the data and updates the
         figure options with intensity and axis information.
+
+        :param datacube: A 3D NumPy array representing the image data, where
+                         the first dimension corresponds to timesteps.
         """
         ims = list()
         for t in range(datacube.shape[0]):
@@ -220,7 +221,7 @@ class axes:
         :param axis: The axis for which to set the ticks. Can be "t", "x", "y",
                      "c" or their corresponding integer values (0, 1, 2, 3).
         :raises Exception: If the number of timesteps is not defined.
-        Set uniform ticks for the specified axis.
+                           Set uniform ticks for the specified axis.
         """
         if self.options.timesteps == None:
             raise Exception(
