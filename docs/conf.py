@@ -3,6 +3,7 @@ import importlib.metadata
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
+    "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
     "autodocsumm",
@@ -19,7 +20,8 @@ copyright = "2025 Angus Forrest and Otautahi-Oxford Group"
 version = importlib.metadata.version("swanplot")
 release = importlib.metadata.version("swanplot")
 
-exclude_patterns = ["_build"]
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "_templates"]
 html_theme = "sphinx_book_theme"
 html_title = "swanplot"
 html_static_path = ["_static"]
@@ -49,6 +51,7 @@ autodoc_typehints_format = "short"
 python_use_unqualified_type_names = True
 python_display_short_literal_types = True
 autodoc_typehints = "none"
+autosummary_generate = True
 autodoc_default_options = {
     "autosummary": True,
     "members": True,
