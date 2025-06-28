@@ -49,24 +49,55 @@ class Fig(Model):
 
 
 ColorStrings: TypeAlias = Annotated[Sequence[cname | pname], MinLen(2)]
-"""type for cmap's input of color string sequence. Allows css color names and python single letter color names. Requires the sequence to be a minimum of two strings"""
+"""
+Type alias for a sequence of color strings used in colormap (cmap) inputs.
+
+This type allows for CSS color names and Python single-letter color names. 
+The sequence must contain at least two color strings to ensure proper color mapping.
+"""
 
 IntensityValues: TypeAlias = Annotated[
     Sequence[Annotated[float, Ge(0), Le(1)]], MinLen(2)
 ]
-"""type for cmap's input of positions float sequence. Allows floats in the closed interval between 0 and 1. Requires the sequence to be a minimum of two floats"""
+"""
+Type alias for a sequence of intensity values for colormap (cmap) inputs.
+
+This type permits float values within the closed interval [0, 1]. 
+The sequence must contain at least two float values to define positions effectively.
+"""
 
 GraphTypes: TypeAlias = Literal["histogram"]
-"""type for graphical representation"""
+"""
+Type alias for specifying the type of graphical representation.
+
+Currently, this type supports only the "histogram" representation.
+"""
 
 DataAxes: TypeAlias = Union[Literal["t", "x", "y", "c"], Literal[0, 1, 2, 3]]
-"""type for datacube axes, allows the use of t,x,y,c or 0,1,2,3"""
+"""
+Type alias for specifying data cube axes.
+
+This type allows the use of axis identifiers as either string labels ("t", "x", "y", "c") 
+or numeric indices (0, 1, 2, 3) to represent the respective axes in a data cube.
+"""
 
 StringInput: TypeAlias = str | Annotated[Sequence[str], MaxLen(4)]
-"""type for set_label's input string that allows a single string or a sequence of strings with a maximum length of 4"""
+"""
+Type alias for input strings in the set_label function.
+
+This type allows for either a single string or a sequence of strings, 
+with the latter being limited to a maximum length of 4 strings. 
+This ensures concise labeling while accommodating multiple labels if needed.
+"""
 
 AxesInput: TypeAlias = DataAxes | Annotated[Sequence[DataAxes], MaxLen(4)]
-"""type for set_label's input axis that allows for a single axis or a sequence of axes with a maximum length of 4"""
+"""
+Type alias for specifying axes in the set_label function.
+
+This type allows for a single axis, defined by the DataAxes type alias, 
+or a sequence of axes, with the sequence limited to a maximum length of 4. 
+This provides flexibility in labeling while maintaining a manageable number of axes.
+"""
 
 
 class axes(Model):
