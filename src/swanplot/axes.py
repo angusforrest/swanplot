@@ -28,16 +28,17 @@ class Fig(Model):
     time_unit: str = ""
     x_unit: str = ""
     y_unit: str = ""
+    c_unit: str = ""
     t_axis: Sequence[float] | None = None
     x_axis: Sequence[float] | None = None
     y_axis: Sequence[float] | None = None
+    max_intensity: float | None = None
+    min_intensity: float | None = None
     x_bins: int | None = None
     y_bins: int | None = None
     max_points: int | None = None
-    max_intensity: float | None = None
-    min_intensity: float | None = None
-    width: int = 600
-    height: int = 600
+    width: int | None = None
+    height: int | None = None
     margin: int = 40
     timesteps: int = 1
     x_label: str = ""
@@ -56,20 +57,21 @@ IntensityValues: TypeAlias = Annotated[
 GraphTypes: TypeAlias = Literal["histogram"]
 """type for graphical representation"""
 
-DataAxes: TypeAlias = Union[Literal["t", "x", "y"], Literal[0, 1, 2]]
-"""type for datacube axes, allows the use of t,x,y or 0,1,2"""
+DataAxes: TypeAlias = Union[Literal["t", "x", "y", "c"], Literal[0, 1, 2, 3]]
+"""type for datacube axes, allows the use of t,x,y,c or 0,1,2,3"""
 
-StringInput: TypeAlias = str | Annotated[Sequence[str], MaxLen(3)]
-"""type for set_label's input string that allows a single string or a sequence of strings with a maximum length of 3"""
+StringInput: TypeAlias = str | Annotated[Sequence[str], MaxLen(4)]
+"""type for set_label's input string that allows a single string or a sequence of strings with a maximum length of 4"""
 
-AxesInput: TypeAlias = DataAxes | Annotated[Sequence[DataAxes], MaxLen(3)]
-"""type for set_label's input axis that allows for a single axis or a sequence of axes with a maximum length of 3 """
+AxesInput: TypeAlias = DataAxes | Annotated[Sequence[DataAxes], MaxLen(4)]
+"""type for set_label's input axis that allows for a single axis or a sequence of axes with a maximum length of 4"""
 
 
 class axes:
     def __init__(self):
         """
-        A class to represent axes for plotting data.
+        A class to represent axes for plotting data, including color schemes,
+        data options, and methods for plotting and saving figures.
         """
 
         self.color_scheme: ColorScheme = ColorScheme()
@@ -109,10 +111,12 @@ class axes:
         datacube: np.ndarray,
     ):
         """
-        Create a histogram from the data.
+        Create a histogram from the provided 3D image data.
 
-        :param datacube: A 3D NumPy array representing the image data.
-        :param temp_tiff: If True, saves a temporary TIFF file.
+        :param datacube: A 3D NumPy array representing the image data, where
+                         the first dimension corresponds to timesteps.
+        This method generates a TIFF image from the data and updates the
+        figure options with intensity and axis information.
         """
         ims = list()
         for t in range(datacube.shape[0]):
@@ -125,27 +129,71 @@ class axes:
         self.options.min_intensity = int(extremes.min())
         self.options.compact = True
         if self.options.t_axis == None:
-            self.t_axis(start=0, end=datacube.shape[0] - 1)
+            self.uniform_ticks(start=0, end=datacube.shape[0] - 1, axis="t")
         self.options.timesteps = datacube.shape[0]
         if self.options.x_axis == None:
-            self.x_axis(start=0, end=datacube.shape[1])
+            self.uniform_ticks(start=0, end=datacube.shape[1], axis="x")
         self.options.x_bins = datacube.shape[1]
         if self.options.y_axis == None:
-            self.y_axis(start=0, end=datacube.shape[2])
+            self.uniform_ticks(start=0, end=datacube.shape[2], axis="y")
         self.options.y_bins = datacube.shape[2]
+        if self.options.width == None:
+            self.options.width = (
+                datacube.shape[1] + 2 * self.options.margin
+                if datacube.shape[1] >= 256
+                else 256 + 2 * self.options.margin
+            )
+        if self.options.height == None:
+            self.options.height = (
+                datacube.shape[2] + 2 * self.options.margin
+                if datacube.shape[2] >= 256
+                else 256 + 2 * self.options.margin
+            )
         self.type = "histogram"
         return
+
+    def figsize(
+        self,
+        width: Annotated[int, Ge(256)],
+        height: Annotated[int, Ge(256)],
+        margin: Annotated[int, Ge(40)] | None = None,
+    ):
+        """
+        Set the figure's dimensions and margin.
+
+        If no margin is provided, and width and height are already set,
+        the provided width and height are assumed to be the total width
+        and total height of the figure.
+
+        :param width: Width of the figure in pixels.
+        :param height: Height of the figure in pixels.
+        :param margin: Margin around the figure in pixels (optional).
+        """
+        if margin == None:
+            if self.options.width == None and self.options.height == None:
+                self.options.width = width + 2 * self.options.margin
+                self.options.height = height + 2 * self.options.margin
+            else:
+                if width <= 296 or height <= 296:
+                    raise Exception(
+                        f"Total width or height is not large enough,{width},{height}"
+                    )
+                self.options.width = width
+                self.options.height = height
+        else:
+            self.options.width = width + 2 * margin
+            self.options.height = height + 2 * margin
 
     def set_unit(self, unit: str, axis: DataAxes):
         """
         Set the unit for the specified axis.
 
         This method updates the unit of measurement for the specified axis
-        (time, x, or y) in the figure options.
+        (time, x, y, or c) in the figure options.
 
         :param unit: The unit to set for the specified axis.
         :param axis: The axis for which to set the unit. Can be "t", "x", "y",
-                     or their corresponding integer values (0, 1, 2).
+                     "c" or their corresponding integer values (0, 1, 2, 3).
         """
         match axis:
             case "t" | 0:
@@ -162,15 +210,17 @@ class axes:
         axis: DataAxes,
     ):
         """
-        Set uniform ticks for the specified axis.
+        Generate and set uniform ticks for the specified axis.
 
-        This method generates evenly spaced ticks between the specified start
+        This method creates evenly spaced ticks between the specified start
         and end values for the given axis.
 
         :param start: The start value for the axis.
         :param end: The end value for the axis.
         :param axis: The axis for which to set the ticks. Can be "t", "x", "y",
-                     or their corresponding integer values (0, 1, 2).
+                     "c" or their corresponding integer values (0, 1, 2, 3).
+        :raises Exception: If the number of timesteps is not defined.
+        Set uniform ticks for the specified axis.
         """
         if self.options.timesteps == None:
             raise Exception(
@@ -186,6 +236,19 @@ class axes:
                 self.options.y_axis = input
 
     def custom_ticks(self, input: Sequence[float], axis: DataAxes):
+        """
+        Set custom ticks for the specified axis.
+
+        This method allows the user to define specific tick values for the
+        given axis, ensuring the number of ticks matches the number of
+        timesteps in the data.
+
+        :param input: A sequence of float values representing the custom ticks.
+        :param axis: The axis for which to set the custom ticks. Can be "t",
+                     "x","y","c" or their corresponding integer values (0, 1, 2, 3).
+        :raises Exception: If the number of timesteps is not defined or if the
+                          length of provided ticks does not match the number of timesteps.
+        """
         if self.options.timesteps == None:
             raise Exception(
                 f"Data has not been loaded and therefore ticks number cannot be verified"
@@ -204,14 +267,17 @@ class axes:
 
     def set_label(self, string: StringInput, axis: AxesInput):
         """
-        Set the label for the specified axis.
+        Assign labels to the specified axis.
 
-        This method updates the label for the specified axis (time, x, or y)
-        in the figure options.
+        This method updates the label for the specified axis (time, x, y, or c)
+        in the figure options. It can handle both single strings and sequences
+        of strings.
 
-        :param string: The label to set for the specified axis.
+        :param string: The label(s) to set for the specified axis.
         :param axis: The axis for which to set the label. Can be "t", "x", "y",
-                     or their corresponding integer values (0, 1, 2).
+                     "c" or their corresponding integer values (0, 1, 2, 3).
+        :raises Exception: If the provided string and axis types do not match
+                          or if their lengths are inconsistent.
         """
         if isinstance(string, Sequence) != isinstance(axis, Sequence):
             raise Exception("Provided a list and a single value for string and axis")
@@ -232,9 +298,12 @@ class axes:
 
     def set_loop(self, loop: bool = True):
         """
-        Set whether the plot should loop.
+        Configure whether the plot should loop.
 
-        :param loop: If True, the plot will loop.
+        This method sets the looping behavior of the plot, allowing it to
+        repeat indefinitely if desired.
+
+        :param loop: If True, the plot will loop; otherwise, it will not.
         """
         self.options.loop = loop
 
@@ -272,12 +341,17 @@ class axes:
         print_website: bool = True,
     ):
         """
-        Save the figure to a file.
+        Save the figure to a specified file.
+
+        This method allows the user to save the figure in either JSON or TIFF
+        format, with options for output style and file extension verification.
 
         :param fname: The filename to save the figure to.
         :param style: The style of the output (pretty or compact).
-        :param format: The format to save the figure in (currently only json).
-        :param print_website: If True, prints a message with the upload link.
+        :param format: The format to save the figure in (currently supports json and tiff).
+        :param force: If True, allows saving with a different file extension than the specified format.
+        :param print_website: If True, prints a message with the upload link after saving.
+        :raises Exception: If the specified format does not match the file extension and force is False.
         """
         ext = os.path.splitext(fname)[1]
         if not force and ext != format and ext != "":

@@ -21,10 +21,9 @@ Example
 	def main():
 	    ax = plt.axes()
 	    ax.hist(example_histogram(), compact=True)
-	    ax.set_label("x-axis","x")
-	    ax.set_label("y-axis","y")
+	    ax.set_label(["t-axis","x-axis","y-axis"],["t","x","y"])
 	    ax.uniform_axis(start=-4, end=10,"x")
-	    ax.uniform_axis(start=300, end=400,"x")
+	    ax.uniform_axis(start=300, end=400,"y")
 	    ax.set_loop()
 	    ax.cmap(
 	        colors=["black", "pink", "steelblue", "green", "white"],
