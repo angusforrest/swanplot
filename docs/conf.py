@@ -45,6 +45,7 @@ autoclass_content = "both"
 napoleon_use_param = True
 napoleon_preprocess_types = True
 always_use_bars_union = True
+autodoc_typehints_format = "short"
 autodoc_default_options = {
     "autosummary": True,
     "members": True,
