@@ -2,7 +2,6 @@ import importlib.metadata
 
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
     "autodocsumm",
@@ -43,7 +42,7 @@ autodoc_typehints_format = "short"
 python_use_unqualified_type_names = True
 python_display_short_literal_types = True
 autodoc_typehints = "none"
-autosummary_generate = True
+# autosummary_generate = True
 autodoc_default_options = {
     "autosummary": True,
     "members": True,
