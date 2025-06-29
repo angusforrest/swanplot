@@ -125,11 +125,12 @@ class Graph(Model):
 
 
 class axes:
+    """
+    A class to represent axes for plotting data, including color schemes,
+    data options, and methods for plotting and saving figures.
+    """
+
     def __init__(self):
-        """
-        A class to represent axes for plotting data, including color schemes,
-        data options, and methods for plotting and saving figures.
-        """
         self.graph = Graph()
 
     def _plot(
