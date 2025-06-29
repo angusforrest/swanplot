@@ -28,6 +28,10 @@ html_static_path = ["_static"]
 html_show_sourcelink = False
 html_theme_options = {
     "use_edit_page_button": False,
+    "navbar_start": ["navbar-logo"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": ["navbar-icon-links"],
+    "navbar_persistent": ["search-button"],
 }
 html_baseurl = "https://swanplot.readthedocs.io/en/latest/"
 html_sourcelink_suffix = ""
