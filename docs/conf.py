@@ -3,10 +3,10 @@ import importlib.metadata
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
-    "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
     "myst_nb",
+    "sphinx.ext.autosummary",
 ]
 # "sphinxcontrib.autodoc_pydantic",
 # "autodocsumm",
