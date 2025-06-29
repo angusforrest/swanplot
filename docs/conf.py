@@ -2,11 +2,9 @@ import importlib.metadata
 
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.mathjax",
-    "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
-    "myst_nb",
 ]
 # "sphinxcontrib.autodoc_pydantic",
 # "autodocsumm",
@@ -35,7 +33,6 @@ html_theme_options = {
     "use_edit_page_button": False,
 }
 html_baseurl = "https://swanplot.readthedocs.io/en/latest/"
-nb_execution_mode = "force"
 html_sourcelink_suffix = ""
 autoclass_content = "class"
 napoleon_use_param = True
