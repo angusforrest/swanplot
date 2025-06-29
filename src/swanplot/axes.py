@@ -12,7 +12,12 @@ import io
 
 
 class Model(BaseModel):
-    model_config = ConfigDict(extra="forbid", validate_default=True)
+    model_config = ConfigDict(
+        extra="forbid",
+        validate_default=True,
+        validate_assignment=True,
+        use_attribute_docstrings=True,
+    )
 
 
 class ColorScheme(Model):
@@ -100,16 +105,32 @@ This provides flexibility in labeling while maintaining a manageable number of a
 """
 
 
-class axes(Model):
+class Graph(Model):
+    color_scheme: ColorScheme = ColorScheme()
     """
-    A class to represent axes for plotting data, including color schemes,
-    data options, and methods for plotting and saving figures.
+        
+    """
+    type: GraphTypes | None = None
+    """
+        
+    """
+    data: str | None = None
+    """
+        
+    """
+    options: Fig = Fig()
+    """
+        
     """
 
-    color_scheme: ColorScheme = ColorScheme()
-    type: GraphTypes | None = None
-    data: str | None = None
-    options: Fig = Fig()
+
+class axes:
+    def __init__(self):
+        """
+        A class to represent axes for plotting data, including color schemes,
+        data options, and methods for plotting and saving figures.
+        """
+        self.graph = Graph()
 
     def _plot(
         self,
@@ -134,8 +155,8 @@ class axes(Model):
         # print(pts)
         # for t in pts.keys():
         #     frames.append(Frame(timestep=t, pts=pts[t]))
-        # self.data = frames
-        # self.type = "frame"
+        # self.graph.data = frames
+        # self.graph.type = "frame"
         # return
 
     def hist(
@@ -156,33 +177,33 @@ class axes(Model):
             ims.append(Image.fromarray((datacube[t, ...]).astype(np.uint8), mode="L"))
         output = io.BytesIO()
         ims[0].save(output, "tiff", save_all=True, append_images=ims[1:])
-        self.data = base64.b64encode(output.getvalue()).decode("utf-8")
+        self.graph.data = base64.b64encode(output.getvalue()).decode("utf-8")
         extremes = np.array([i.getextrema() for i in ims])
-        self.options.max_intensity = int(extremes.max())
-        self.options.min_intensity = int(extremes.min())
-        self.options.compact = True
-        if self.options.t_axis == None:
-            self.uniform_ticks(start=0, end=datacube.shape[0] - 1, axis="t")
-        self.options.timesteps = datacube.shape[0]
-        if self.options.x_axis == None:
-            self.uniform_ticks(start=0, end=datacube.shape[1], axis="x")
-        self.options.x_bins = datacube.shape[1]
-        if self.options.y_axis == None:
-            self.uniform_ticks(start=0, end=datacube.shape[2], axis="y")
-        self.options.y_bins = datacube.shape[2]
-        if self.options.width == None:
-            self.options.width = (
-                datacube.shape[1] + 2 * self.options.margin
+        self.graph.options.max_intensity = int(extremes.max())
+        self.graph.options.min_intensity = int(extremes.min())
+        self.graph.options.compact = True
+        if self.graph.options.t_axis == None:
+            self.graph.uniform_ticks(start=0, end=datacube.shape[0] - 1, axis="t")
+        self.graph.options.timesteps = datacube.shape[0]
+        if self.graph.options.x_axis == None:
+            self.graph.uniform_ticks(start=0, end=datacube.shape[1], axis="x")
+        self.graph.options.x_bins = datacube.shape[1]
+        if self.graph.options.y_axis == None:
+            self.graph.uniform_ticks(start=0, end=datacube.shape[2], axis="y")
+        self.graph.options.y_bins = datacube.shape[2]
+        if self.graph.options.width == None:
+            self.graph.options.width = (
+                datacube.shape[1] + 2 * self.graph.options.margin
                 if datacube.shape[1] >= 256
-                else 256 + 2 * self.options.margin
+                else 256 + 2 * self.graph.options.margin
             )
-        if self.options.height == None:
-            self.options.height = (
-                datacube.shape[2] + 2 * self.options.margin
+        if self.graph.options.height == None:
+            self.graph.options.height = (
+                datacube.shape[2] + 2 * self.graph.options.margin
                 if datacube.shape[2] >= 256
-                else 256 + 2 * self.options.margin
+                else 256 + 2 * self.graph.options.margin
             )
-        self.type = "histogram"
+        self.graph.type = "histogram"
         return
 
     def figsize(
@@ -203,19 +224,19 @@ class axes(Model):
         :param margin: Margin around the figure in pixels (optional).
         """
         if margin == None:
-            if self.options.width == None and self.options.height == None:
-                self.options.width = width + 2 * self.options.margin
-                self.options.height = height + 2 * self.options.margin
+            if self.graph.options.width == None and self.graph.options.height == None:
+                self.graph.options.width = width + 2 * self.graph.options.margin
+                self.graph.options.height = height + 2 * self.graph.options.margin
             else:
                 if width <= 296 or height <= 296:
                     raise Exception(
                         f"Total width or height is not large enough,{width},{height}"
                     )
-                self.options.width = width
-                self.options.height = height
+                self.graph.options.width = width
+                self.graph.options.height = height
         else:
-            self.options.width = width + 2 * margin
-            self.options.height = height + 2 * margin
+            self.graph.options.width = width + 2 * margin
+            self.graph.options.height = height + 2 * margin
 
     def set_unit(self, unit: str, axis: DataAxes):
         """
@@ -230,13 +251,13 @@ class axes(Model):
         """
         match axis:
             case "t" | 0:
-                self.options.t_unit = unit
+                self.graph.options.t_unit = unit
             case "x" | 1:
-                self.options.x_unit = unit
+                self.graph.options.x_unit = unit
             case "y" | 2:
-                self.options.y_unit = unit
+                self.graph.options.y_unit = unit
             case "c" | 3:
-                self.options.y_unit = unit
+                self.graph.options.y_unit = unit
 
     def uniform_ticks(
         self,
@@ -257,20 +278,20 @@ class axes(Model):
         :raises Exception: If the number of timesteps is not defined.
                            Set uniform ticks for the specified axis.
         """
-        if self.options.timesteps == None:
+        if self.graph.options.timesteps == None:
             raise Exception(
                 f"Data has not been loaded and therefore ticks number cannot be verified"
             )
-        input = np.linspace(start, end, self.options.timesteps).tolist()
+        input = np.linspace(start, end, self.graph.options.timesteps).tolist()
         match axis:
             case "t" | 0:
-                self.options.t_axis = input
+                self.graph.options.t_axis = input
             case "x" | 1:
-                self.options.x_axis = input
+                self.graph.options.x_axis = input
             case "y" | 2:
-                self.options.y_axis = input
+                self.graph.options.y_axis = input
             case "c" | 3:
-                self.options.c_axis = input
+                self.graph.options.c_axis = input
 
     def custom_ticks(self, input: Sequence[float], axis: DataAxes):
         """
@@ -286,23 +307,23 @@ class axes(Model):
         :raises Exception: If the number of timesteps is not defined or if the
                           length of provided ticks does not match the number of timesteps.
         """
-        if self.options.timesteps == None:
+        if self.graph.options.timesteps == None:
             raise Exception(
                 f"Data has not been loaded and therefore ticks number cannot be verified"
             )
-        if len(input) != self.options.timesteps:
+        if len(input) != self.graph.options.timesteps:
             raise Exception(
-                f"The length of provided ticks is not the same as the number of timesteps in your data {self.options.timesteps}"
+                f"The length of provided ticks is not the same as the number of timesteps in your data {self.graph.options.timesteps}"
             )
         match axis:
             case "t" | 0:
-                self.options.t_axis = input
+                self.graph.options.t_axis = input
             case "x" | 1:
-                self.options.x_axis = input
+                self.graph.options.x_axis = input
             case "y" | 2:
-                self.options.y_axis = input
+                self.graph.options.y_axis = input
             case "c" | 3:
-                self.options.c_axis = input
+                self.graph.options.c_axis = input
 
     def set_label(self, string: StringInput, axis: AxesInput):
         """
@@ -329,11 +350,11 @@ class axes(Model):
         for a, b in zip(input, axes):
             match b:
                 case "t" | 0:
-                    self.options.t_label = a
+                    self.graph.options.t_label = a
                 case "x" | 1:
-                    self.options.x_label = a
+                    self.graph.options.x_label = a
                 case "y" | 2:
-                    self.options.y_label = a
+                    self.graph.options.y_label = a
 
     def set_loop(self, loop: bool = True):
         """
@@ -344,7 +365,7 @@ class axes(Model):
 
         :param loop: If True, the plot will loop; otherwise, it will not.
         """
-        self.options.loop = loop
+        self.graph.options.loop = loop
 
     def cmap(
         self,
@@ -368,7 +389,7 @@ class axes(Model):
                 output.append(pythontocss[color])
             else:
                 output.append(color)
-        self.color_scheme = ColorScheme(colors=colors, positions=positions)
+        self.graph.color_scheme = ColorScheme(colors=colors, positions=positions)
         return
 
     def savefig(
@@ -412,7 +433,7 @@ class axes(Model):
         match input:
             case "tiff":
                 with open(fname, "wb") as file:
-                    file.write(base64.b64decode(self.data))
+                    file.write(base64.b64decode(self.graph.data))
             case "json":
                 with open(fname, "w") as file:
                     indentation: int
@@ -421,7 +442,7 @@ class axes(Model):
                             indentation = 4
                         case "compact":
                             indentation = 0
-                    output = json.dumps(self.model_dump(), indent=indentation)
+                    output = json.dumps(self.graph.model_dump(), indent=indentation)
                     file.write(output)
                     if print_website:
                         print(f"upload {fname} to https://animate.deno.dev")
