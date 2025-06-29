@@ -11,8 +11,6 @@ extensions = [
 # "IPython.sphinxext.ipython_console_highlighting",
 source_suffix = [".rst", ".md"]
 master_doc = "index"
-autodoc_pydantic_model_show_json = True
-autodoc_pydantic_settings_show_json = False
 
 # General information about the project.
 project = "swanplot"
@@ -21,7 +19,7 @@ copyright = "2025 Angus Forrest and Otautahi-Oxford Group"
 version = importlib.metadata.version("swanplot")
 release = importlib.metadata.version("swanplot")
 
-templates_path = ["_templates"]
+# templates_path = ["_templates"]
 exclude_patterns = ["_build", "_templates"]
 # html_theme = "pydata_sphinx_theme"
 html_theme = "sphinx_book_theme"
