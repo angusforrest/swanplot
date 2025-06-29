@@ -33,6 +33,7 @@ html_theme_options = {
     "navbar_center": ["navbar-nav"],
     "navbar_end": ["navbar-icon-links"],
     "navbar_persistent": ["search-button"],
+    "secondary_sidebar_items": [],
 }
 html_baseurl = "https://swanplot.readthedocs.io/en/latest/"
 html_sourcelink_suffix = ""
