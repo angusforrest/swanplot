@@ -5,8 +5,8 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
-    "myst_nb",
     "sphinx.ext.autosummary",
+    "myst_nb",
 ]
 # "sphinxcontrib.autodoc_pydantic",
 # "autodocsumm",
