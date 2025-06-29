@@ -1,6 +1,7 @@
+.. module:: swanplot
 Detailed API documentation
 ==========================
 
 
-.. autoclass:: swanplot.axes
+.. autoclass:: axes
 
