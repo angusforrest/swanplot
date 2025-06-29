@@ -38,7 +38,7 @@ html_theme_options = {
         "colab_url": "https://colab.research.google.com/",
         "notebook_interface": "jupyterlab",
     },
-    "use_edit_page_button": True,
+    "use_edit_page_button": False,
     "use_issues_button": True,
     "use_repository_button": True,
     "use_download_button": True,
