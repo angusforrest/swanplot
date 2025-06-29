@@ -1,4 +1,5 @@
 .. module:: swanplot
+
 Detailed API documentation
 ==========================
 

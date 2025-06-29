@@ -27,7 +27,6 @@ html_title = "swanplot"
 html_static_path = ["_static"]
 html_show_sourcelink = False
 html_theme_options = {
-    "path_to_docs": "docs",
     "use_edit_page_button": False,
 }
 html_baseurl = "https://swanplot.readthedocs.io/en/latest/"
