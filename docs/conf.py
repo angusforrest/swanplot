@@ -31,17 +31,7 @@ html_static_path = ["_static"]
 html_show_sourcelink = False
 html_theme_options = {
     "path_to_docs": "docs",
-    "repository_url": "https://github.com/angusforrest/swanplot",
-    "repository_branch": "main",
-    "launch_buttons": {
-        "binderhub_url": "https://mybinder.org",
-        "colab_url": "https://colab.research.google.com/",
-        "notebook_interface": "jupyterlab",
-    },
     "use_edit_page_button": False,
-    "use_issues_button": True,
-    "use_repository_button": True,
-    "use_download_button": True,
 }
 html_baseurl = "https://swanplot.readthedocs.io/en/latest/"
 nb_execution_mode = "force"
