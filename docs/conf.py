@@ -26,6 +26,7 @@ html_theme = "pydata_sphinx_theme"
 html_title = "swanplot"
 html_static_path = ["_static"]
 html_show_sourcelink = False
+html_sidebars = {"**": []}
 html_theme_options = {
     "use_edit_page_button": False,
     "navbar_start": ["navbar-logo"],
