@@ -25,7 +25,7 @@ dev = [
 
 [project.optional-dependencies]
 docs = [
-"sphinx>=7.2.6", "pandoc", "myst-nb", "pydata-sphinx-theme", "ipython","sphinx-autodoc-typehints","autodocsumm","autodoc-pydantic"]
+"sphinx>=7.2.6", "pandoc", "myst-nb", "pydata-sphinx-theme", "ipython","sphinx-autodoc-typehints","autodocsumm","autodoc-pydantic","sphinx-book-theme"]
 
 [project.urls]
 Documentation = "https://swanplot.readthedocs.io"

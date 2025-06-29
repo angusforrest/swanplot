@@ -25,7 +25,8 @@ release = importlib.metadata.version("swanplot")
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "_templates"]
-html_theme = "pydata_sphinx_theme"
+# html_theme = "pydata_sphinx_theme"
+html_theme = "sphinx_book_theme"
 html_title = "swanplot"
 html_static_path = ["_static"]
 html_show_sourcelink = False
