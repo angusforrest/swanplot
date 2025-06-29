@@ -5,9 +5,10 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
+    "autodocsumm",
+    "myst_nb",
 ]
 # "sphinxcontrib.autodoc_pydantic",
-# "autodocsumm",
 # "IPython.sphinxext.ipython_console_highlighting",
 source_suffix = [".rst", ".md"]
 master_doc = "index"
